@@ -72,13 +72,19 @@ a:hover { color: #FFF }
 .icon-help { border: 1px solid #EEE; padding: 2px; display: inline-block; width: 17px; text-align: center; font-size: 13px; margin-right: 6px; vertical-align: 1px }
 .icon-help.active { background-color: #EEE }
 
+/* -- Head -- */
+.head { font-size: 30px; display: inline-block; left: 0%; position: absolute; }
+.head a { font-family: Monospace; font-weight: normal; border: 0px; color: black; transition: 1s; background-color: #FFDB00; padding: 5px 20px; display: block; float: left }
+.head a:hover, .head-link.active { background-color: #FFFA22; color: black; transition: 0s }
+.head .head-link {
+	box-shadow: inset 15px 0px 55px -40px black; font-size: 14px; font-family: Roboto; text-decoration: underline;
+	line-height: 36px; font-weight: bold; text-transform: uppercase; color: rgba(0, 0, 0, 0.83);
+}
+
 /* -- Left -- */
 
-.head { font-size: 30px; display: inline-block; background-color: #FFDB00; left: 0%; position: absolute; padding: 5px 20px; color: black; font-family: Monospace; font-weight: normal; border: 0px; transition: 1s }
-.head:hover { background-color: #FFFA22; color: black; transition: 0s }
-
 .left { float: left; position: absolute; width: 220px; padding-left: 20px; padding-right: 20px; margin-top: 60px; text-align: right; display: none }
-.right { float: left; padding-left: 60px; margin-left: 40px; max-width: 1000px; padding-right: 60px; padding-top: 100px }
+.right { float: left; padding-left: 30px; margin-left: 0px; max-width: 1000px; padding-right: 60px; padding-top: 100px }
 
 .left .avatar {
 	background-color: #F0F0F0; width: 60px; height: 60px; border-radius: 100%; margin-bottom: 10px;
@@ -135,7 +141,7 @@ a:hover { color: #FFF }
 .post .details .like.loading { pointer-events: none; animation: bounce .3s infinite alternate ease-out; animation-delay: 1s; }
 
 .post .body { font-size: 21.5px; line-height: 1.6; font-family: Tinos; float: left; max-width: 600px }
-.post .body video { box-shadow: 0px 7px 20px 1px rgba(0,0,0,0.5); transition: 0.3s all; max-height: 500px; }
+.post .body video { box-shadow: 0px 7px 20px 1px rgba(0,0,0,0.5); transition: 0.3s all; max-height: 500px; background-color: black; }
 .post .body video.playing { opacity: 1 }
 .post .body video { opacity: 0.6 }
 

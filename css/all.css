@@ -1,6 +1,6 @@
 
 
-/* ---- data/1NgBW8ohapJ2f2dRXThEYrDTYghUzLXgf2/css/Comments.css ---- */
+/* ---- data/1Gif7PqWTzVWDQ42Mo7np3zXmGAo3DXc7h/css/Comments.css ---- */
 
 
 h2#Comments { clear: both }
@@ -57,7 +57,7 @@ input.text:focus, textarea:focus { border-color: #28404A; outline: none; backgro
 
 
 
-/* ---- data/1NgBW8ohapJ2f2dRXThEYrDTYghUzLXgf2/css/ReactionGifs.css ---- */
+/* ---- data/1Gif7PqWTzVWDQ42Mo7np3zXmGAo3DXc7h/css/ReactionGifs.css ---- */
 
 
 /* Design based on medium */
@@ -134,13 +134,19 @@ a:hover { color: #FFF }
 .icon-help { border: 1px solid #EEE; padding: 2px; display: inline-block; width: 17px; text-align: center; font-size: 13px; margin-right: 6px; vertical-align: 1px }
 .icon-help.active { background-color: #EEE }
 
+/* -- Head -- */
+.head { font-size: 30px; display: inline-block; left: 0%; position: absolute; }
+.head a { font-family: Monospace; font-weight: normal; border: 0px; color: black; -webkit-transition: 1s; -moz-transition: 1s; -o-transition: 1s; -ms-transition: 1s; transition: 1s ; background-color: #FFDB00; padding: 5px 20px; display: block; float: left }
+.head a:hover, .head-link.active { background-color: #FFFA22; color: black; -webkit-transition: 0s ; -moz-transition: 0s ; -o-transition: 0s ; -ms-transition: 0s ; transition: 0s  }
+.head .head-link {
+	-webkit-box-shadow: inset 15px 0px 55px -40px black; -moz-box-shadow: inset 15px 0px 55px -40px black; -o-box-shadow: inset 15px 0px 55px -40px black; -ms-box-shadow: inset 15px 0px 55px -40px black; box-shadow: inset 15px 0px 55px -40px black ; font-size: 14px; font-family: Roboto; text-decoration: underline;
+	line-height: 36px; font-weight: bold; text-transform: uppercase; color: rgba(0, 0, 0, 0.83);
+}
+
 /* -- Left -- */
 
-.head { font-size: 30px; display: inline-block; background-color: #FFDB00; left: 0%; position: absolute; padding: 5px 20px; color: black; font-family: Monospace; font-weight: normal; border: 0px; -webkit-transition: 1s ; -moz-transition: 1s ; -o-transition: 1s ; -ms-transition: 1s ; transition: 1s  }
-.head:hover { background-color: #FFFA22; color: black; -webkit-transition: 0s ; -moz-transition: 0s ; -o-transition: 0s ; -ms-transition: 0s ; transition: 0s  }
-
 .left { float: left; position: absolute; width: 220px; padding-left: 20px; padding-right: 20px; margin-top: 60px; text-align: right; display: none }
-.right { float: left; padding-left: 60px; margin-left: 40px; max-width: 1000px; padding-right: 60px; padding-top: 100px }
+.right { float: left; padding-left: 30px; margin-left: 0px; max-width: 1000px; padding-right: 60px; padding-top: 100px }
 
 .left .avatar {
 	background-color: #F0F0F0; width: 60px; height: 60px; -webkit-border-radius: 100%; -moz-border-radius: 100%; -o-border-radius: 100%; -ms-border-radius: 100%; border-radius: 100% ; margin-bottom: 10px;
@@ -197,7 +203,7 @@ a:hover { color: #FFF }
 .post .details .like.loading { pointer-events: none; -webkit-animation: bounce .3s infinite alternate ease-out; -moz-animation: bounce .3s infinite alternate ease-out; -o-animation: bounce .3s infinite alternate ease-out; -ms-animation: bounce .3s infinite alternate ease-out; animation: bounce .3s infinite alternate ease-out ; -webkit-animation-delay: 1s; -moz-animation-delay: 1s; -o-animation-delay: 1s; -ms-animation-delay: 1s; animation-delay: 1s ; }
 
 .post .body { font-size: 21.5px; line-height: 1.6; font-family: Tinos; float: left; max-width: 600px }
-.post .body video { -webkit-box-shadow: 0px 7px 20px 1px rgba(0,0,0,0.5); -moz-box-shadow: 0px 7px 20px 1px rgba(0,0,0,0.5); -o-box-shadow: 0px 7px 20px 1px rgba(0,0,0,0.5); -ms-box-shadow: 0px 7px 20px 1px rgba(0,0,0,0.5); box-shadow: 0px 7px 20px 1px rgba(0,0,0,0.5) ; -webkit-transition: 0.3s all; -moz-transition: 0.3s all; -o-transition: 0.3s all; -ms-transition: 0.3s all; transition: 0.3s all ; max-height: 500px; }
+.post .body video { -webkit-box-shadow: 0px 7px 20px 1px rgba(0,0,0,0.5); -moz-box-shadow: 0px 7px 20px 1px rgba(0,0,0,0.5); -o-box-shadow: 0px 7px 20px 1px rgba(0,0,0,0.5); -ms-box-shadow: 0px 7px 20px 1px rgba(0,0,0,0.5); box-shadow: 0px 7px 20px 1px rgba(0,0,0,0.5) ; -webkit-transition: 0.3s all; -moz-transition: 0.3s all; -o-transition: 0.3s all; -ms-transition: 0.3s all; transition: 0.3s all ; max-height: 500px; background-color: black; }
 .post .body video.playing { opacity: 1 }
 .post .body video { opacity: 0.6 }
 
@@ -279,7 +285,7 @@ blockquote { border-left: 3px solid #333; margin-left: 0px; padding-left: 1em }
 
 
 
-/* ---- data/1NgBW8ohapJ2f2dRXThEYrDTYghUzLXgf2/css/fonts.css ---- */
+/* ---- data/1Gif7PqWTzVWDQ42Mo7np3zXmGAo3DXc7h/css/fonts.css ---- */
 
 
 /* Base64 encoder: http://www.motobit.com/util/base64-decoder-encoder.asp */
@@ -316,7 +322,7 @@ blockquote { border-left: 3px solid #333; margin-left: 0px; padding-left: 1em }
 
 
 
-/* ---- data/1NgBW8ohapJ2f2dRXThEYrDTYghUzLXgf2/css/github.css ---- */
+/* ---- data/1Gif7PqWTzVWDQ42Mo7np3zXmGAo3DXc7h/css/github.css ---- */
 
 
 /*
@@ -446,7 +452,7 @@ github.com style (c) Vasily Polovnyov <vast@whiteants.net>
 
 
 
-/* ---- data/1NgBW8ohapJ2f2dRXThEYrDTYghUzLXgf2/css/icons.css ---- */
+/* ---- data/1Gif7PqWTzVWDQ42Mo7np3zXmGAo3DXc7h/css/icons.css ---- */
 
 
 .icon { display: inline-block; vertical-align: text-bottom; background-repeat: no-repeat; }

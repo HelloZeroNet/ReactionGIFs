@@ -4,6 +4,7 @@ class ZeroBlog extends ZeroFrame
 		@site_info = null
 		@server_info = null
 		@page = 1
+		@orderby = "date_published DESC"
 		@my_post_votes = {}
 		@lazy_videos = []
 
@@ -122,7 +123,7 @@ class ZeroBlog extends ZeroFrame
 		elem.find(".body").html(body)
 
 		title_hash = lastcomment.post_title.replace(/[#?& ]/g, "+").replace(/[+]+/g, "+")
-		elem.find(".postlink").text(lastcomment.post_title).attr("href", "?Post:#{lastcomment.post_id}:#{title_hash}#Comments")
+		elem.find(".postlink").text(lastcomment.post_title).attr("href", "?Post:#{lastcomment.post_id}:#{title_hash}")
 
 	applyPagerdata: (page, limit, has_next) ->
 		pager = $(".pager")
@@ -141,6 +142,13 @@ class ZeroBlog extends ZeroFrame
 			$("body").addClass("page-main")
 			if match = url.match /page=([0-9]+)/
 				@page = parseInt(match[1])
+			if match = url.match /orderby=([a-z_]+)/
+				if match[1] == "like"
+					@orderby = "votes DESC"
+					$(".head-link-mostliked").addClass("active")
+				else if match[1] == "last_comment"
+					@orderby = "last_comment DESC"
+					$(".head-link-mostcommented").addClass("active")
 			@pageMain()
 
 	# - Pages -
@@ -170,15 +178,19 @@ class ZeroBlog extends ZeroFrame
 		limit = 15
 		query = """
 			SELECT
-				post.*, COUNT(comment_id) AS comments,
+				post.*, COUNT(comment_id) AS comments, MAX(comment.date_added) AS last_comment,
 				(SELECT COUNT(*) FROM post_vote WHERE post_vote.post_id = post.post_id) AS votes
 			FROM post
 			LEFT JOIN comment USING (post_id)
 			GROUP BY post_id
-			ORDER BY date_published DESC
+			ORDER BY #{@orderby}
 			LIMIT #{(@page-1)*limit}, #{limit+1}
 		"""
 		@cmd "dbQuery", [query], (res) =>
+			if @server_info and @server_info.rev < 570
+				@cmd "wrapperNotification", ["error", "This site requires ZeroNet 0.3.2 rev570 or newer!<br>Please update!"]
+				return
+
 			parse_res = (res) =>
 				s = (+ new Date)
 				if res.length > limit # Has next page
@@ -298,7 +310,7 @@ class ZeroBlog extends ZeroFrame
 		$(".details .published", elem).html(date_published).data("content", post.date_published)
 		# Comments num
 		if post.comments > 0
-			$(".details .comments-num", elem).css("display", "inline").attr("href", "?Post:#{post.post_id}:#{title_hash}#Comments")
+			$(".details .comments-num", elem).css("display", "inline").attr("href", "?Post:#{post.post_id}:#{title_hash}")
 			$(".details .comments-num .num", elem).text("#{post.comments} comments")
 		else
 			$(".details .comments-num", elem).css("display", "none")
