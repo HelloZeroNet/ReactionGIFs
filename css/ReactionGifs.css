@@ -1,0 +1,207 @@
+/* Design based on medium */
+
+body { color: #FFF; margin: 10px; padding: 0px; font-family: 'Roboto', sans-serif; height: 15000px; overflow: hidden; backface-visibility: hidden; #191A1F; background: #2D2E32 url(../img/bg.png) no-repeat; }
+body.loaded { height: auto; overflow: auto }
+h1, h2, h3, h4 { font-family: 'Roboto', sans-serif; font-weight: normal; margin: 0px; padding: 0px }
+h1 { font-size: 24px; line-height: 1.2em; font-weight: lighter; letter-spacing: -0.5px; margin-bottom: 5px; color: #FFDB00 }
+h2 { margin-top: 2em }
+h3 { font-size: 24px; margin-top: 2em }
+h1 + h2, h2 + h3 { margin-top: inherit }
+
+p { margin-top: 0.9em; margin-bottom: 0.9em }
+hr { margin: 20px 0px; border: none; border-bottom: 1px solid #eee; margin-left: auto; margin-right: auto; width: 120px; }
+small { font-size: 80%; color: #999; }
+
+a { border-bottom: 1px solid #3498db; text-decoration: none; color: white; font-weight: bold }
+a.nolink { border-bottom: none }
+a:hover { color: #FFF }
+
+.button {
+	padding: 5px 10px; margin-left: 10px; background-color: #FFDA00; border-bottom: 2px solid #999998; background-position: left center;
+	border-radius: 0px; text-decoration: none; transition: all 0.5s ease-out; color: #333
+}
+.button:hover { background-color: #fff400; border-color: #fff400; border-bottom: 2px solid #fff400; transition: none; color: black }
+.button:active { position: relative; top: 1px }
+
+/*.button-delete { background-color: #e74c3c; border-bottom-color: #A83F34; color: white }*/
+.button-outline { background-color: transparent; color: #464545; border: 1px solid #3A3A3A; }
+
+.button-delete:hover { background-color: #FF5442; border: 1px solid #FF5442; color: white }
+.button-ok:hover { background-color: #27AE60; border: 1px solid #27AE60; color: white }
+
+.button.loading {
+	color: rgba(0,0,0,0); background: #999 url(../img/loading.gif) no-repeat center center;
+	transition: all 0.5s ease-out; pointer-events: none; border-bottom: 2px solid #666
+}
+
+.cancel { margin-left: 10px; font-size: 80%; color: #999; }
+
+
+.template { display: none }
+
+/* Editable */
+.editable { outline: none }
+.editable-edit:hover { opacity: 1; border: none; color: #333 }
+.editable-edit {
+	opacity: 0; float: left; margin-top: 0px; margin-left: -40px; padding: 8px 20px; transition: all 0.3s; width: 0px; display: inline-block; padding-right: 0px;
+	color: rgba(100,100,100,0.5); text-decoration: none; font-size: 18px; font-weight: normal; border: none;
+}
+/*.editing { white-space: pre-wrap; z-index: 1; position: relative; outline: 10000px solid rgba(255,255,255,0.9) !important; }
+.editing p { margin: 0px; padding: 0px }*/ /* IE FIX */
+.editor { width: 100%; display: block; overflow :hidden; resize: none; border: none; box-sizing: border-box; z-index: 900; position: relative }
+.editor:focus { border: 0px; outline-offset: 0px }
+
+
+/* -- Editbar -- */
+
+.bottombar {
+	display: none; position: fixed; padding: 10px 20px; opacity: 0; background-color: rgba(255,255,255,0.9);
+	right: 30px; bottom: 0px; z-index: 999; transition: all 0.3s; transform: translateY(50px)
+}
+.bottombar.visible { transform: translateY(0px); opacity: 1 }
+.publishbar { z-index: 990}
+.publishbar.visible { display: inline-block; }
+.editbar { perspective: 900px }
+.markdown-help {
+	position: absolute; bottom: 30px; transform: translateX(0px) rotateY(-40deg); transform-origin: right; right: 0px;
+	list-style-type: none; background-color: rgba(255,255,255,0.9); padding: 10px; opacity: 0; transition: all 0.6s; display: none
+}
+.markdown-help.visible { transform: none; opacity: 1 }
+.markdown-help li { margin: 10px 0px }
+.markdown-help code { font-size: 100% }
+.icon-help { border: 1px solid #EEE; padding: 2px; display: inline-block; width: 17px; text-align: center; font-size: 13px; margin-right: 6px; vertical-align: 1px }
+.icon-help.active { background-color: #EEE }
+
+/* -- Left -- */
+
+.head { font-size: 30px; display: inline-block; background-color: #FFDB00; left: 0%; position: absolute; padding: 5px 20px; color: black; font-family: Monospace; font-weight: normal; border: 0px; transition: 1s }
+.head:hover { background-color: #FFFA22; color: black; transition: 0s }
+
+.left { float: left; position: absolute; width: 220px; padding-left: 20px; padding-right: 20px; margin-top: 60px; text-align: right; display: none }
+.right { float: left; padding-left: 60px; margin-left: 40px; max-width: 1000px; padding-right: 60px; padding-top: 100px }
+
+.left .avatar {
+	background-color: #F0F0F0; width: 60px; height: 60px; border-radius: 100%; margin-bottom: 10px;
+	background-position: center center; background-size: 70%; display: inline-block; image-rendering: pixelated;
+}
+.left h1 a.nolink { font-family: Tinos; display: inline-block; padding: 1px }
+.left h1 a.editable-edit { float: none }
+.left h2 { font-size: 15px; font-family: Tinos; line-height: 1.6em; color: #AAA; margin-top: 14px; letter-spacing: 0.2px }
+.left ul, .left li { padding: 0px; margin: 0px; list-style-type: none; line-height: 2em }
+.left hr { margin-left: 100px; margin-right: 0px; width: auto }
+/*.left .links { width: 230px; margin-left: -60px }*/
+.left .links.editor { text-align: left !important }
+
+.lastcomments { background-color: #FAFAFA; margin-left: -25px; padding-right: 15px; padding-bottom: 5px; padding-top: 3px; margin-top: 40px; margin-right: -15px; display: none }
+.lastcomments h3 { margin-top: 20px; }
+.lastcomments .lastcomment { font-size: 85%; margin-top: 20px; margin-bottom: 30px; margin-left: 20px; }
+.lastcomments .lastcomment .user_name { font-weight: bold; }
+.lastcomments .lastcomment .details { font-size: 90%; }
+.lastcomments .lastcomment .details .at { color: #999 }
+.lastcomments .lastcomment .details .postlink { border-bottom: 1px solid #BBB; }
+
+/* -- Post -- */
+
+.posts .new { display: none; position: absolute; top: -50px; margin-left: 310px; left: 50%; transform: translateX(-50%); }
+
+.posts, .post-full { display: none; position: relative; }
+.page-main .posts { display: block }
+.page-post.loaded .post-full { display: block; border-bottom: none }
+
+
+.post { margin-bottom: 50px; padding-bottom: 50px; border-bottom: 0px solid #eee; min-width: 500px; width: 1100px }
+.post .title a { text-decoration: none; color: inherit; display: inline-block; border-bottom: none; font-weight: inherit; #fff400; clear: both; }
+.posts .title a:visited { color: #fff400 }
+.post h1 { width: 100% }
+.post .details { color: #BBB; margin-top: 5px; margin-bottom: 20px; margin-right: 20px; margin-left: -20px; width: 500px; float: left; font-size: 10px; text-align: right }
+.post .details .published { text-transform: uppercase; font-weight: bold; color: #5A5D62; }
+.post .details .comments-num { border: none; color: #BBB; font-weight: normal; }
+.post .details .comments-num .num { border-bottom: 1px solid #35373C }
+.post .details .comments-num:hover .num { border-bottom: 1px solid #95979C; }
+
+.post .details .like {
+	padding: 5px 5px; margin-top: 12px; font-weight: normal; transition: all 0.3s;
+	display: block; clear: both; float: right; border: 1px solid #3A3A3A; padding: 11px 15px; border-radius: 0px;
+}
+.post .details .like .icon-heart:before, .post .details .like .icon-heart:after { background-color: #464545; transition: all 0.3s }
+.post .details .like .icon-heart { transform-style: preserve-3d; transition: all 0.3s }
+.post .details .like:hover .icon-heart { transform: scale(1.1) }
+.post .details .like:hover .icon-heart:before, .post .details .like:hover .icon-heart:after { background-color: #088FD3 }
+.post .details .like.active .icon-heart:before, .post .details .like.active .icon-heart:after { background-color: #088FD3 }
+.post .details .like.active .icon-heart-anim { transform: scale(1.8); opacity: 0; transition: all 1s ease-in-out }
+.post .details .like .num { margin-left: 25px; color: #CCC; transition: all 0.3s; font-size: 15px }
+.post .details .like:hover { border-color: #088FD3; transition: 0s }
+.post .details .like:hover .num {  }
+.post .details .like.loading { pointer-events: none; animation: bounce .3s infinite alternate ease-out; animation-delay: 1s; }
+
+.post .body { font-size: 21.5px; line-height: 1.6; font-family: Tinos; float: left; max-width: 600px }
+.post .body video { box-shadow: 0px 7px 20px 1px rgba(0,0,0,0.5); transition: 0.3s all; max-height: 500px; }
+.post .body video.playing { opacity: 1 }
+.post .body video { opacity: 0.6 }
+
+.post .body h1 { text-align: center; margin-top: 50px }
+.post .body h1:before { content: " "; border-top: 1px solid #EEE; width: 120px; display: block; margin-left: auto; margin-right: auto; margin-bottom: 50px; }
+
+.post .body p + ul { margin-top: -0.5em }
+.post .body li { margin-top: 0.5em; margin-bottom: 0.5em }
+.post .body hr:first-of-type { display: none }
+
+.post .body a img { margin-bottom: -8px }
+.post .body img { max-width: 100% }
+
+code {
+	background-color: #f5f5f5; border: 1px solid #ccc; padding: 0px 5px; overflow: auto; border-radius: 2px; display: inline-block;
+	color: #444; font-weight: normal; font-size: 60%; vertical-align: text-bottom; border-bottom-width: 2px;
+}
+.post .body pre { table-layout: fixed; width: auto; display: table; white-space: normal; }
+.post .body pre code { padding: 10px 20px; white-space: pre; max-width: 850px }
+
+blockquote { border-left: 3px solid #333; margin-left: 0px; padding-left: 1em }
+/*.post .more {
+	display: inline-block; border: 1px solid #eee; padding: 10px 25px; border-radius: 26px; font-size: 11px; color: #AAA; font-weight: normal;
+	left: 50%; position: relative; transform: translateX(-50%);
+}*/
+
+.post .more { border: 2px solid #333; padding: 10px 20px; font-size: 15px; margin-top: 30px; display: none; transition: all 0.3s }
+.post .more .readmore {  }
+.post .more:hover { color: white; box-shadow: inset 150px 0px 0px 0px #333; }
+.post .more:active { color: white; box-shadow: inset 150px 0px 0px 0px #FFDA00; transition: none; border-color: #FFDA00 }
+
+.pager { margin-bottom: 200px; padding-left: 600px }
+.pager a { border: 2px solid #333; padding: 10px 20px; font-size: 15px; display: none; transition: all 0.3s }
+.pager a:hover { color: white; box-shadow: inset 150px 0px 0px 0px #333; }
+.pager a:active { color: black; box-shadow: inset 150px 0px 0px 0px #FFDA00; transition: none; border-color: #FFDA00 }
+.pager .next { float: right }
+.pager .prev:hover { box-shadow: inset -150px 0px 0px 0px #333; }
+.pager .prev:active { box-shadow: inset -150px 0px 0px 0px #FFDA00; }
+
+.foot { text-align: right; font-size: 80%; opacity: 0.5; display: none }
+
+/* Score */
+/*
+.score {
+	border: 1px solid #eee; margin-right: 5px; margin-left: 5px; padding: 2px 7px; border-radius: 10px; color: #AAA; background-position: left center; font-weight: bold; font-size: 12px;
+	display: inline-block; height: 1.2em; overflow: hidden; vertical-align: -0.5em; line-height: 7px; transition: background-color 0.3s; height: 20px; box-sizing: border-box
+}
+.score-active, .score-inactive { transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: inline-block; margin-top: 3px }
+.score-active { display: block; margin-top: 5px }
+.score.active { background-color: #2ecc71; color: white }
+.score.loading {
+	color: rgba(255,255,255,0) !important; background: #2ecc71 url(../img/loading.gif) no-repeat center center;
+	transition: background 0.5s ease-out; pointer-events: none; border: 1px solid #2ecc71
+}
+
+.score.active .score-inactive, .score:hover .score-inactive { transform: translateY(-14px); opacity: 0.5 }
+.score.active .score-active, .score:hover .score-active { transform: translateY(-14px) }
+.score:hover, .score.active { border: 1px solid #2ecc71; color: #AAA; }
+
+.score:active {  border: 1px solid #AAA !important; transform: translateY(1px) }
+
+.noscore .score-inactive .icon-up { margin-left: 6px }
+.noscore .score-inactive .score-num { display: none }
+*/
+
+@keyframes bounce {
+	  0% { transform: translateY(0); }
+	100% { transform: translateY(-3px); }
+}

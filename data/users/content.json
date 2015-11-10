@@ -1,0 +1,25 @@
+{
+ "files": {}, 
+ "ignore": ".*", 
+ "modified": 1447023686.64, 
+ "signs": {
+  "1Gif7PqWTzVWDQ42Mo7np3zXmGAo3DXc7h": "HE/+syGEMkrg20HJsDPCDfM8IkauzrkfoL0N3Nw9O1u9H+II1V6+RYA3SthoMAVF7p+zot6Chczb1zDZHsX02K8="
+ }, 
+ "user_contents": {
+  "cert_signers": {
+   "zeroid.bit": [ "1iD5ZQJMNXu43w1qLB8sfdHVKppVMduGz" ]
+  }, 
+  "permission_rules": {
+   ".*": {
+    "files_allowed": "data.json", 
+    "max_size": 10000
+   }, 
+   "bitid/.*@zeroid.bit": { "max_size": 40000 }, 
+   "bitmsg/.*@zeroid.bit": { "max_size": 15000 }
+  }, 
+  "permissions": {
+   "banexample@zeroid.bit": false, 
+   "nofish@zeroid.bit": { "max_size": 20000 }
+  }
+ }
+}
