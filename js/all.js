@@ -1420,6 +1420,7 @@
 
     ZeroBlog.prototype.addLazyVideos = function() {
       var video, _i, _len, _ref, _results;
+      this.lazy_videos = [];
       _ref = $("video");
       _results = [];
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
@@ -1623,7 +1624,7 @@
             return;
           }
           parse_res = function(res) {
-            var elem, post, s, _i, _len;
+            var delay, elem, full, i, post, s, _i, _len;
             s = +(new Date);
             if (res.length > limit) {
               res.pop();
@@ -1631,8 +1632,8 @@
             } else {
               _this.applyPagerdata(_this.page, limit, false);
             }
-            for (_i = 0, _len = res.length; _i < _len; _i++) {
-              post = res[_i];
+            for (i = _i = 0, _len = res.length; _i < _len; i = ++_i) {
+              post = res[i];
               elem = $("#post_" + post.post_id);
               if (elem.length === 0) {
                 elem = $(".post.template").clone().removeClass("template").attr("id", "post_" + post.post_id);
@@ -1642,10 +1643,18 @@
                   elem.appendTo(".posts");
                 }
                 elem.find(".like").attr("id", "post_like_" + post.post_id).on("click", _this.submitPostVote);
+                if (i > 2) {
+                  delay = 800;
+                } else {
+                  delay = 0;
+                }
+                _this.applyPostdata(elem, post, full = false, delay = delay);
               }
-              _this.applyPostdata(elem, post);
             }
             _this.pageLoaded();
+            setTimeout((function() {
+              return _this.addLazyVideos();
+            }), 1000);
             _this.log("Posts loaded in", (+(new Date)) - s, "ms");
             return $(".posts .new").on("click", function() {
               _this.cmd("fileGet", ["data/data.json"], function(res) {
@@ -1731,10 +1740,13 @@
       return false;
     };
 
-    ZeroBlog.prototype.applyPostdata = function(elem, post, full) {
+    ZeroBlog.prototype.applyPostdata = function(elem, post, full, delay) {
       var body, date_published, title_hash;
       if (full == null) {
         full = false;
+      }
+      if (delay == null) {
+        delay = 0;
       }
       title_hash = post.title.replace(/[#?& ]/g, "+").replace(/[+]+/g, "+");
       elem.data("object", "Post:" + post.post_id);
@@ -1782,7 +1794,13 @@
         body = post.body.replace(/^([\s\S]*?)\n---\n[\s\S]*$/, "$1");
       }
       if ($(".body", elem).data("content") !== post.body) {
-        return $(".body", elem).html(Text.renderMarked(body)).data("content", post.body);
+        if (delay) {
+          return setTimeout((function() {
+            return $(".body", elem).html(Text.renderMarked(body)).data("content", post.body);
+          }), delay);
+        } else {
+          return $(".body", elem).html(Text.renderMarked(body)).data("content", post.body);
+        }
       }
     };
 

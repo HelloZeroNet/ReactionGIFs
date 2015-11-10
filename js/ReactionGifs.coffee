@@ -39,6 +39,7 @@ class ZeroBlog extends ZeroFrame
 		@log "inited!"
 
 	addLazyVideos: =>
+		@lazy_videos = []
 		for video in $("video")
 			video = $(video)
 			@lazy_videos.push([video, video.offset().top, video.innerHeight()])
@@ -199,7 +200,7 @@ class ZeroBlog extends ZeroFrame
 				else
 					@applyPagerdata(@page, limit, false)
 
-				for post in res
+				for post, i in res
 					elem = $("#post_#{post.post_id}")
 					if elem.length == 0 # Not exits yet
 						elem = $(".post.template").clone().removeClass("template").attr("id", "post_#{post.post_id}")
@@ -209,8 +210,13 @@ class ZeroBlog extends ZeroFrame
 							elem.appendTo(".posts")
 						# elem.find(".score").attr("id", "post_score_#{post.post_id}").on "click", @submitPostVote # Submit vote
 						elem.find(".like").attr("id", "post_like_#{post.post_id}").on "click", @submitPostVote
-					@applyPostdata(elem, post)
+						if i > 2
+							delay = 800
+						else
+							delay = 0
+						@applyPostdata(elem, post, full=false, delay=delay)
 				@pageLoaded()
+				setTimeout ( => @addLazyVideos() ), 1000  # Add delayed videos to lazy loading
 				@log "Posts loaded in", ((+ new Date)-s),"ms"
 
 				$(".posts .new").on "click", => # Create new blog post
@@ -298,7 +304,7 @@ class ZeroBlog extends ZeroFrame
 
 
 	# Apply from data to post html element
-	applyPostdata: (elem, post, full=false) ->
+	applyPostdata: (elem, post, full=false, delay=0) ->
 		title_hash = post.title.replace(/[#?& ]/g, "+").replace(/[+]+/g, "+")
 		elem.data("object", "Post:"+post.post_id)
 		$(".title .editable", elem).html(post.title).attr("href", "?Post:#{post.post_id}:#{title_hash}").data("content", post.title)
@@ -346,7 +352,12 @@ class ZeroBlog extends ZeroFrame
 			body = post.body.replace(/^([\s\S]*?)\n---\n[\s\S]*$/, "$1")
 
 		if $(".body", elem).data("content") != post.body
-			$(".body", elem).html(Text.renderMarked(body)).data("content", post.body)
+			if delay
+				setTimeout ( ->
+					$(".body", elem).html(Text.renderMarked(body)).data("content", post.body)
+				), delay
+			else
+				$(".body", elem).html(Text.renderMarked(body)).data("content", post.body)
 
 
 	# Wrapper websocket connection ready

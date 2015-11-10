@@ -7,8 +7,8 @@
  "description": "Optional files demo", 
  "files": {
   "css/all.css": {
-   "sha512": "43c4ddca84e3254b03637b072ea509f88281fa34cbab903368628589ccded269", 
-   "size": 123349
+   "sha512": "6201ebef617646f3e2fa04f7b5acf56171e68f8d460cafe99d42409ee146b84e", 
+   "size": 123852
   }, 
   "data-default/data.json": {
    "sha512": "aff6accbac7e950ff567105666ddf29b70ca7c2dcd9d90f9a969509a42a9b195", 
@@ -35,12 +35,12 @@
    "size": 723
   }, 
   "index.html": {
-   "sha512": "d4216ab87aa8ac9f4da89ceb19b54749c491217b7b3a9018526da3495160ab57", 
-   "size": 6227
+   "sha512": "285941316c6a510402bbb7c0f320544652e29c8b98b1571fcd7cb7ea071037f1", 
+   "size": 6413
   }, 
   "js/all.js": {
-   "sha512": "518fe09115add1de3d1eab0cd55ce856c8ca07eadd6313256ca78d94e747a0ac", 
-   "size": 212968
+   "sha512": "43acde59351c0935c3d4506d50b4ee89b79da303a98c4ecb1d536df40d21417e", 
+   "size": 213428
   }, 
   "updater/updater.py": {
    "sha512": "777c8d0f7902b6c10f04089e19b96139a9166784c986892a2a03a50003471677", 
@@ -1600,15 +1600,15 @@
    "signers_required": 1
   }
  }, 
- "modified": 1447027396.419, 
+ "modified": 1447181979.228, 
  "optional": "(data/mp4/.*)", 
  "sign": [
-  42333329487027913913995705919300451202559291689817030940466307325652992657619, 
-  50954318319304358868774351618175895139235629995188359976756931487195727807021
+  106530342392587302670797095048760787778203081501450993992056368910230031689522, 
+  82648964637588193364790902854068131813051984957647306830573792282257141944056
  ], 
  "signers_sign": "G6WYaWjVkyB4VHJaK8zWdf4QeDqj6+nXLKrrlRostAjjFbcYzb5r7F0yri0QHT9LO1JPdaPrF+4B2yurErzqvLw=", 
  "signs": {
-  "1Gif7PqWTzVWDQ42Mo7np3zXmGAo3DXc7h": "HMxmyPz5CgirhBgm7r1gH3ZPR2ZnQyfvfIGgA2pscPYz3Km7GuQFDv0DCMxhj3jCLo1Ak83t8tRhzV1UUtKzPF4="
+  "1Gif7PqWTzVWDQ42Mo7np3zXmGAo3DXc7h": "HCwcwIYRK8LSto4Vo6kO1wz2VuUyXTLcrLv2ZMSmHnkdJFDErxZwpcm6/cH0ET+3Dd6cKGOPnybPcMEACgMTT1M="
  }, 
  "signs_required": 1, 
  "title": "REaction GIFs", 
