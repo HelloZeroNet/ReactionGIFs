@@ -8,7 +8,7 @@ class Text
 		for i in [0..text.length-1]
 			hash = text.charCodeAt(i) + ((hash << 5) - hash)
 		color = '#'
-		return "hsl(" + (hash % 360) + ",50%,70%)";
+		return "hsl(" + (hash % 360) + ",30%,70%)";
 		for i in [0..2]
 			value = (hash >> (i * 8)) & 0xFF
 			color += ('00' + value.toString(16)).substr(-2)

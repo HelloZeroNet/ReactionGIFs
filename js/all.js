@@ -855,7 +855,7 @@
         hash = text.charCodeAt(i) + ((hash << 5) - hash);
       }
       color = '#';
-      return "hsl(" + (hash % 360) + ",50%,70%)";
+      return "hsl(" + (hash % 360) + ",30%,70%)";
       for (i = _j = 0; _j <= 2; i = ++_j) {
         value = (hash >> (i * 8)) & 0xFF;
         color += ('00' + value.toString(16)).substr(-2);
@@ -912,6 +912,7 @@
   window.Text = new Text();
 
 }).call(this);
+
 
 
 /* ---- data/1Gif7PqWTzVWDQ42Mo7np3zXmGAo3DXc7h/js/utils/Time.coffee ---- */
@@ -1380,7 +1381,8 @@
       this.site_info = null;
       this.server_info = null;
       this.page = 1;
-      this.orderby = "date_published DESC";
+      this.orderby = null;
+      this.sql_orderby = "date_published DESC";
       this.my_post_votes = {};
       this.lazy_videos = [];
       this.event_page_load = $.Deferred();
@@ -1549,10 +1551,10 @@
       var pager;
       pager = $(".pager");
       if (page > 1) {
-        pager.find(".prev").css("display", "inline-block").attr("href", "?page=" + (page - 1));
+        pager.find(".prev").css("display", "inline-block").attr("href", ("?page=" + (page - 1)) + (this.orderby ? "&orderby=" + this.orderby : ""));
       }
       if (has_next) {
-        return pager.find(".next").css("display", "inline-block").attr("href", "?page=" + (page + 1));
+        return pager.find(".next").css("display", "inline-block").attr("href", ("?page=" + (page + 1)) + (this.orderby ? "&orderby=" + this.orderby : ""));
       }
     };
 
@@ -1569,11 +1571,12 @@
           this.page = parseInt(match[1]);
         }
         if (match = url.match(/orderby=([a-z_]+)/)) {
+          this.orderby = match[1];
           if (match[1] === "like") {
-            this.orderby = "votes DESC";
+            this.sql_orderby = "votes DESC";
             $(".head-link-mostliked").addClass("active");
           } else if (match[1] === "last_comment") {
-            this.orderby = "last_comment DESC";
+            this.sql_orderby = "last_comment DESC";
             $(".head-link-mostcommented").addClass("active");
           }
         }
@@ -1615,11 +1618,11 @@
         type = "normal";
       }
       limit = 15;
-      query = "SELECT\n	post.*, COUNT(comment_id) AS comments, MAX(comment.date_added) AS last_comment,\n	(SELECT COUNT(*) FROM post_vote WHERE post_vote.post_id = post.post_id) AS votes\nFROM post\nLEFT JOIN comment USING (post_id)\nGROUP BY post_id\nORDER BY " + this.orderby + "\nLIMIT " + ((this.page - 1) * limit) + ", " + (limit + 1);
+      query = "SELECT\n	post.*, COUNT(comment_id) AS comments, MAX(comment.date_added) AS last_comment,\n	(SELECT COUNT(*) FROM post_vote WHERE post_vote.post_id = post.post_id) AS votes\nFROM post\nLEFT JOIN comment USING (post_id)\nGROUP BY post_id\nORDER BY " + this.sql_orderby + "\nLIMIT " + ((this.page - 1) * limit) + ", " + (limit + 1);
       return this.cmd("dbQuery", [query], (function(_this) {
         return function(res) {
           var parse_res;
-          if (_this.server_info && _this.server_info.rev < 570) {
+          if (_this.server_info && _this.server_info.rev < 570 && type === "normal") {
             _this.cmd("wrapperNotification", ["error", "This site requires ZeroNet 0.3.2 rev570 or newer!<br>Please update!"]);
             return;
           }
@@ -1632,50 +1635,49 @@
             } else {
               _this.applyPagerdata(_this.page, limit, false);
             }
+            res.reverse();
             for (i = _i = 0, _len = res.length; _i < _len; i = ++_i) {
               post = res[i];
               elem = $("#post_" + post.post_id);
               if (elem.length === 0) {
                 elem = $(".post.template").clone().removeClass("template").attr("id", "post_" + post.post_id);
-                if (type === "update") {
-                  elem.prependTo(".posts");
-                } else {
-                  elem.appendTo(".posts");
-                }
+                elem.prependTo(".posts");
                 elem.find(".like").attr("id", "post_like_" + post.post_id).on("click", _this.submitPostVote);
-                if (i > 2) {
-                  delay = 800;
-                } else {
-                  delay = 0;
-                }
-                _this.applyPostdata(elem, post, full = false, delay = delay);
               }
+              if (i < res.length - 3) {
+                delay = 800;
+              } else {
+                delay = 0;
+              }
+              _this.applyPostdata(elem, post, full = false, delay = delay);
             }
             _this.pageLoaded();
             setTimeout((function() {
               return _this.addLazyVideos();
             }), 1000);
             _this.log("Posts loaded in", (+(new Date)) - s, "ms");
-            return $(".posts .new").on("click", function() {
-              _this.cmd("fileGet", ["data/data.json"], function(res) {
-                var data;
-                data = JSON.parse(res);
-                data.post.unshift({
-                  post_id: data.next_post_id,
-                  title: "New blog post",
-                  date_published: (+(new Date)) / 1000,
-                  body: "Blog post body"
+            if (type === "normal") {
+              return $(".posts .new").on("click", function() {
+                _this.cmd("fileGet", ["data/data.json"], function(res) {
+                  var data;
+                  data = JSON.parse(res);
+                  data.post.unshift({
+                    post_id: data.next_post_id,
+                    title: "New blog post",
+                    date_published: (+(new Date)) / 1000,
+                    body: "Blog post body"
+                  });
+                  data.next_post_id += 1;
+                  elem = $(".post.template").clone().removeClass("template");
+                  _this.applyPostdata(elem, data.post[0]);
+                  elem.hide();
+                  elem.prependTo(".posts").slideDown();
+                  _this.addInlineEditors(elem);
+                  return _this.writeData(data);
                 });
-                data.next_post_id += 1;
-                elem = $(".post.template").clone().removeClass("template");
-                _this.applyPostdata(elem, data.post[0]);
-                elem.hide();
-                elem.prependTo(".posts").slideDown();
-                _this.addInlineEditors(elem);
-                return _this.writeData(data);
+                return false;
               });
-              return false;
-            });
+            }
           };
           if (res.error) {
             query = "SELECT\n	post.*, COUNT(comment_id) AS comments,\n	-1 AS votes\nFROM post\nLEFT JOIN comment USING (post_id)\nGROUP BY post_id\nORDER BY date_published DESC\nLIMIT " + ((_this.page - 1) * limit) + ", " + (limit + 1);

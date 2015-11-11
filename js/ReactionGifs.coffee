@@ -4,7 +4,8 @@ class ZeroBlog extends ZeroFrame
 		@site_info = null
 		@server_info = null
 		@page = 1
-		@orderby = "date_published DESC"
+		@orderby = null
+		@sql_orderby = "date_published DESC"
 		@my_post_votes = {}
 		@lazy_videos = []
 
@@ -129,9 +130,9 @@ class ZeroBlog extends ZeroFrame
 	applyPagerdata: (page, limit, has_next) ->
 		pager = $(".pager")
 		if page > 1
-			pager.find(".prev").css("display", "inline-block").attr("href", "?page=#{page-1}")
+			pager.find(".prev").css("display", "inline-block").attr "href", "?page=#{page-1}" + (if @orderby then "&orderby=#{@orderby}" else "")
 		if has_next
-			pager.find(".next").css("display", "inline-block").attr("href", "?page=#{page+1}")
+			pager.find(".next").css("display", "inline-block").attr "href", "?page=#{page+1}" + (if @orderby then "&orderby=#{@orderby}" else "")
 
 	routeUrl: (url) ->
 		@log "Routing url:", url
@@ -144,11 +145,12 @@ class ZeroBlog extends ZeroFrame
 			if match = url.match /page=([0-9]+)/
 				@page = parseInt(match[1])
 			if match = url.match /orderby=([a-z_]+)/
+				@orderby = match[1]
 				if match[1] == "like"
-					@orderby = "votes DESC"
+					@sql_orderby = "votes DESC"
 					$(".head-link-mostliked").addClass("active")
 				else if match[1] == "last_comment"
-					@orderby = "last_comment DESC"
+					@sql_orderby = "last_comment DESC"
 					$(".head-link-mostcommented").addClass("active")
 			@pageMain()
 
@@ -184,11 +186,11 @@ class ZeroBlog extends ZeroFrame
 			FROM post
 			LEFT JOIN comment USING (post_id)
 			GROUP BY post_id
-			ORDER BY #{@orderby}
+			ORDER BY #{@sql_orderby}
 			LIMIT #{(@page-1)*limit}, #{limit+1}
 		"""
 		@cmd "dbQuery", [query], (res) =>
-			if @server_info and @server_info.rev < 570
+			if @server_info and @server_info.rev < 570 and type == "normal"
 				@cmd "wrapperNotification", ["error", "This site requires ZeroNet 0.3.2 rev570 or newer!<br>Please update!"]
 				return
 
@@ -199,46 +201,44 @@ class ZeroBlog extends ZeroFrame
 					@applyPagerdata(@page, limit, true)
 				else
 					@applyPagerdata(@page, limit, false)
-
+				res.reverse()
 				for post, i in res
 					elem = $("#post_#{post.post_id}")
 					if elem.length == 0 # Not exits yet
 						elem = $(".post.template").clone().removeClass("template").attr("id", "post_#{post.post_id}")
-						if type == "update"
-							elem.prependTo(".posts")
-						else
-							elem.appendTo(".posts")
+						elem.prependTo(".posts")
 						# elem.find(".score").attr("id", "post_score_#{post.post_id}").on "click", @submitPostVote # Submit vote
 						elem.find(".like").attr("id", "post_like_#{post.post_id}").on "click", @submitPostVote
-						if i > 2
-							delay = 800
-						else
-							delay = 0
-						@applyPostdata(elem, post, full=false, delay=delay)
+					if i < res.length-3
+						delay = 800
+					else
+						delay = 0
+					@applyPostdata(elem, post, full=false, delay=delay)
 				@pageLoaded()
 				setTimeout ( => @addLazyVideos() ), 1000  # Add delayed videos to lazy loading
 				@log "Posts loaded in", ((+ new Date)-s),"ms"
 
-				$(".posts .new").on "click", => # Create new blog post
-					@cmd "fileGet", ["data/data.json"], (res) =>
-						data = JSON.parse(res)
-						# Add to data
-						data.post.unshift
-							post_id: data.next_post_id
-							title: "New blog post"
-							date_published: (+ new Date)/1000
-							body: "Blog post body"
-						data.next_post_id += 1
+				if type == "normal"
+					$(".posts .new").on "click", => # Create new blog post
+						@cmd "fileGet", ["data/data.json"], (res) =>
+							data = JSON.parse(res)
+							# Add to data
+							data.post.unshift
+								post_id: data.next_post_id
+								title: "New blog post"
+								date_published: (+ new Date)/1000
+								body: "Blog post body"
+							data.next_post_id += 1
 
-						# Create html elements
-						elem = $(".post.template").clone().removeClass("template")
-						@applyPostdata(elem, data.post[0])
-						elem.hide()
-						elem.prependTo(".posts").slideDown()
-						@addInlineEditors(elem)
+							# Create html elements
+							elem = $(".post.template").clone().removeClass("template")
+							@applyPostdata(elem, data.post[0])
+							elem.hide()
+							elem.prependTo(".posts").slideDown()
+							@addInlineEditors(elem)
 
-						@writeData(data)
-					return false
+							@writeData(data)
+						return false
 
 			# Temporary dbschema bug workaround
 			if res.error
