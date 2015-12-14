@@ -183,6 +183,7 @@
 }).call(this);
 
 
+
 /* ---- data/1Gif7PqWTzVWDQ42Mo7np3zXmGAo3DXc7h/js/lib/jquery.csslater.coffee ---- */
 
 
@@ -310,6 +311,7 @@
   };
 
 }).call(this);
+
 
 
 /* ---- data/1Gif7PqWTzVWDQ42Mo7np3zXmGAo3DXc7h/js/lib/marked.min.js ---- */
@@ -593,6 +595,7 @@
 }).call(this);
 
 
+
 /* ---- data/1Gif7PqWTzVWDQ42Mo7np3zXmGAo3DXc7h/js/utils/InlineEditor.coffee ---- */
 
 
@@ -790,6 +793,7 @@
 }).call(this);
 
 
+
 /* ---- data/1Gif7PqWTzVWDQ42Mo7np3zXmGAo3DXc7h/js/utils/RateLimit.coffee ---- */
 
 
@@ -817,6 +821,7 @@
   };
 
 }).call(this);
+
 
 
 /* ---- data/1Gif7PqWTzVWDQ42Mo7np3zXmGAo3DXc7h/js/utils/Text.coffee ---- */
@@ -987,6 +992,7 @@
 }).call(this);
 
 
+
 /* ---- data/1Gif7PqWTzVWDQ42Mo7np3zXmGAo3DXc7h/js/utils/ZeroFrame.coffee ---- */
 
 
@@ -1096,6 +1102,7 @@
   window.ZeroFrame = ZeroFrame;
 
 }).call(this);
+
 
 
 /* ---- data/1Gif7PqWTzVWDQ42Mo7np3zXmGAo3DXc7h/js/Comments.coffee ---- */
@@ -1349,7 +1356,8 @@
 }).call(this);
 
 
-/* ---- data/1Gif7PqWTzVWDQ42Mo7np3zXmGAo3DXc7h/js/ReactionGifs.coffee ---- */
+
+/* ---- data/1Gif7PqWTzVWDQ42Mo7np3zXmGAo3DXc7h/js/Gifs.coffee ---- */
 
 
 (function() {
@@ -1382,6 +1390,7 @@
       this.server_info = null;
       this.page = 1;
       this.orderby = null;
+      this.section = "DevopsReactions";
       this.sql_orderby = "date_published DESC";
       this.my_post_votes = {};
       this.lazy_videos = [];
@@ -1401,8 +1410,6 @@
               return false;
             });
           }
-          _this.addLazyVideos();
-          _this.checkLazyVideos();
           $(window).on("scroll", function() {
             return RateLimit(200, _this.checkLazyVideos);
           });
@@ -1428,6 +1435,13 @@
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         video = _ref[_i];
         video = $(video);
+        video.off("click").on("click", function() {
+          if (this.paused) {
+            return this.play();
+          } else {
+            return this.pause();
+          }
+        });
         _results.push(this.lazy_videos.push([video, video.offset().top, video.innerHeight()]));
       }
       return _results;
@@ -1544,23 +1558,27 @@
       }
       elem.find(".body").html(body);
       title_hash = lastcomment.post_title.replace(/[#?& ]/g, "+").replace(/[+]+/g, "+");
-      return elem.find(".postlink").text(lastcomment.post_title).attr("href", "?Post:" + lastcomment.post_id + ":" + title_hash);
+      return elem.find(".postlink").text(lastcomment.post_title).attr("href", "?" + this.section + "&Post:" + lastcomment.post_id + ":" + title_hash);
     };
 
     ZeroBlog.prototype.applyPagerdata = function(page, limit, has_next) {
       var pager;
       pager = $(".pager");
       if (page > 1) {
-        pager.find(".prev").css("display", "inline-block").attr("href", ("?page=" + (page - 1)) + (this.orderby ? "&orderby=" + this.orderby : ""));
+        pager.find(".prev").css("display", "inline-block").attr("href", ("?" + this.section + "&page=" + (page - 1)) + (this.orderby ? "&orderby=" + this.orderby : ""));
       }
       if (has_next) {
-        return pager.find(".next").css("display", "inline-block").attr("href", ("?page=" + (page + 1)) + (this.orderby ? "&orderby=" + this.orderby : ""));
+        return pager.find(".next").css("display", "inline-block").attr("href", ("?" + this.section + "&page=" + (page + 1)) + (this.orderby ? "&orderby=" + this.orderby : ""));
       }
     };
 
     ZeroBlog.prototype.routeUrl = function(url) {
       var match;
       this.log("Routing url:", url);
+      if (match = url.match("^(DevopsReactions|RedditGifs|RedditNsfwGifs)")) {
+        this.section = match[1];
+      }
+      $("body").addClass("page-" + this.section);
       if (match = url.match(/Post:([0-9]+)/)) {
         $("body").addClass("page-post");
         this.post_id = parseInt(match[1]);
@@ -1580,6 +1598,16 @@
             $(".head-link-mostcommented").addClass("active");
           }
         }
+        $("body").on("keyup", (function(_this) {
+          return function(e) {
+            if (e.keyCode === 37) {
+              $("a.prev")[0].click();
+            }
+            if (e.keyCode === 39) {
+              return $("a.next")[0].click();
+            }
+          };
+        })(this));
         return this.pageMain();
       }
     };
@@ -1618,7 +1646,7 @@
         type = "normal";
       }
       limit = 15;
-      query = "SELECT\n	post.*, COUNT(comment_id) AS comments, MAX(comment.date_added) AS last_comment,\n	(SELECT COUNT(*) FROM post_vote WHERE post_vote.post_id = post.post_id) AS votes\nFROM post\nLEFT JOIN comment USING (post_id)\nGROUP BY post_id\nORDER BY " + this.sql_orderby + "\nLIMIT " + ((this.page - 1) * limit) + ", " + (limit + 1);
+      query = "SELECT\n	post.*, COUNT(comment_id) AS comments, MAX(comment.date_added) AS last_comment,\n	(SELECT COUNT(*) FROM post_vote WHERE post_vote.post_id = post.post_id) AS votes\nFROM post\nLEFT JOIN comment USING (post_id)\nWHERE source = '" + this.section + "'\nGROUP BY post_id\nORDER BY " + this.sql_orderby + "\nLIMIT " + ((this.page - 1) * limit) + ", " + (limit + 1);
       return this.cmd("dbQuery", [query], (function(_this) {
         return function(res) {
           var parse_res;
@@ -1635,16 +1663,15 @@
             } else {
               _this.applyPagerdata(_this.page, limit, false);
             }
-            res.reverse();
             for (i = _i = 0, _len = res.length; _i < _len; i = ++_i) {
               post = res[i];
               elem = $("#post_" + post.post_id);
               if (elem.length === 0) {
                 elem = $(".post.template").clone().removeClass("template").attr("id", "post_" + post.post_id);
-                elem.prependTo(".posts");
+                elem.appendTo(".posts");
                 elem.find(".like").attr("id", "post_like_" + post.post_id).on("click", _this.submitPostVote);
               }
-              if (i < res.length - 3) {
+              if (i > 3) {
                 delay = 800;
               } else {
                 delay = 0;
@@ -1694,6 +1721,8 @@
       $('pre code').each(function(i, block) {
         return hljs.highlightBlock(block);
       });
+      this.addLazyVideos();
+      this.checkLazyVideos();
       this.event_page_load.resolve();
       return this.cmd("innerLoaded", true);
     };
@@ -1752,15 +1781,15 @@
       }
       title_hash = post.title.replace(/[#?& ]/g, "+").replace(/[+]+/g, "+");
       elem.data("object", "Post:" + post.post_id);
-      $(".title .editable", elem).html(post.title).attr("href", "?Post:" + post.post_id + ":" + title_hash).data("content", post.title);
+      $(".title .editable", elem).html(post.title).attr("href", "?" + this.section + "&Post:" + post.post_id + ":" + title_hash).data("content", post.title);
       date_published = Time.since(post.date_published);
       if (post.body.match(/^---/m)) {
         date_published += " &middot; " + (Time.readtime(post.body));
-        $(".more", elem).css("display", "inline-block").attr("href", "?Post:" + post.post_id + ":" + title_hash);
+        $(".more", elem).css("display", "inline-block").attr("href", "?" + this.section + "&Post:" + post.post_id + ":" + title_hash);
       }
       $(".details .published", elem).html(date_published).data("content", post.date_published);
       if (post.comments > 0) {
-        $(".details .comments-num", elem).css("display", "inline").attr("href", "?Post:" + post.post_id + ":" + title_hash);
+        $(".details .comments-num", elem).css("display", "inline").attr("href", "?" + this.section + "&Post:" + post.post_id + ":" + title_hash);
         $(".details .comments-num .num", elem).text(post.comments + " comments");
       } else {
         $(".details .comments-num", elem).css("display", "none");

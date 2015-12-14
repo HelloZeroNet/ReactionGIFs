@@ -5,6 +5,7 @@ class ZeroBlog extends ZeroFrame
 		@server_info = null
 		@page = 1
 		@orderby = null
+		@section = "DevopsReactions"
 		@sql_orderby = "date_published DESC"
 		@my_post_votes = {}
 		@lazy_videos = []
@@ -24,11 +25,10 @@ class ZeroBlog extends ZeroFrame
 					$(".editbar .markdown-help").toggleClassLater("visible", 10)
 					$(".editbar .icon-help").toggleClass("active")
 					return false
-
-			@addLazyVideos()
-			@checkLazyVideos()
 			$(window).on "scroll", =>
 				RateLimit(200, @checkLazyVideos)
+
+
 			$(".foot").css("display", "block")
 
 		$.when(@event_site_info).done =>
@@ -43,6 +43,11 @@ class ZeroBlog extends ZeroFrame
 		@lazy_videos = []
 		for video in $("video")
 			video = $(video)
+			video.off("click").on "click", ->
+				if this.paused
+					this.play()
+				else
+					this.pause()
 			@lazy_videos.push([video, video.offset().top, video.innerHeight()])
 
 	checkLazyVideos: =>
@@ -68,8 +73,9 @@ class ZeroBlog extends ZeroFrame
 				video[0].play()
 				video.addClass("playing")
 			else
-				video[0].pause()
-				video.removeClass("playing")
+				if not video[0].paused
+					video[0].pause()
+					video.removeClass("playing")
 
 
 	loadData: (query="new") ->
@@ -125,17 +131,21 @@ class ZeroBlog extends ZeroFrame
 		elem.find(".body").html(body)
 
 		title_hash = lastcomment.post_title.replace(/[#?& ]/g, "+").replace(/[+]+/g, "+")
-		elem.find(".postlink").text(lastcomment.post_title).attr("href", "?Post:#{lastcomment.post_id}:#{title_hash}")
+		elem.find(".postlink").text(lastcomment.post_title).attr("href", "?#{@section}&Post:#{lastcomment.post_id}:#{title_hash}")
 
 	applyPagerdata: (page, limit, has_next) ->
 		pager = $(".pager")
 		if page > 1
-			pager.find(".prev").css("display", "inline-block").attr "href", "?page=#{page-1}" + (if @orderby then "&orderby=#{@orderby}" else "")
+			pager.find(".prev").css("display", "inline-block").attr "href", "?#{@section}&page=#{page-1}" + (if @orderby then "&orderby=#{@orderby}" else "")
 		if has_next
-			pager.find(".next").css("display", "inline-block").attr "href", "?page=#{page+1}" + (if @orderby then "&orderby=#{@orderby}" else "")
+			pager.find(".next").css("display", "inline-block").attr "href", "?#{@section}&page=#{page+1}" + (if @orderby then "&orderby=#{@orderby}" else "")
 
 	routeUrl: (url) ->
 		@log "Routing url:", url
+		if match = url.match("^(DevopsReactions|RedditGifs|RedditNsfwGifs)")
+			@section = match[1]
+		$("body").addClass("page-#{@section}")
+
 		if match = url.match /Post:([0-9]+)/
 			$("body").addClass("page-post")
 			@post_id = parseInt(match[1])
@@ -152,6 +162,11 @@ class ZeroBlog extends ZeroFrame
 				else if match[1] == "last_comment"
 					@sql_orderby = "last_comment DESC"
 					$(".head-link-mostcommented").addClass("active")
+			$("body").on "keyup", (e) =>
+				if e.keyCode == 37 # Left
+					$("a.prev")[0].click()
+				if e.keyCode == 39 # Right
+					$("a.next")[0].click()
 			@pageMain()
 
 	# - Pages -
@@ -185,6 +200,7 @@ class ZeroBlog extends ZeroFrame
 				(SELECT COUNT(*) FROM post_vote WHERE post_vote.post_id = post.post_id) AS votes
 			FROM post
 			LEFT JOIN comment USING (post_id)
+			WHERE source = '#{@section}'
 			GROUP BY post_id
 			ORDER BY #{@sql_orderby}
 			LIMIT #{(@page-1)*limit}, #{limit+1}
@@ -201,15 +217,14 @@ class ZeroBlog extends ZeroFrame
 					@applyPagerdata(@page, limit, true)
 				else
 					@applyPagerdata(@page, limit, false)
-				res.reverse()
 				for post, i in res
 					elem = $("#post_#{post.post_id}")
 					if elem.length == 0 # Not exits yet
 						elem = $(".post.template").clone().removeClass("template").attr("id", "post_#{post.post_id}")
-						elem.prependTo(".posts")
+						elem.appendTo(".posts")
 						# elem.find(".score").attr("id", "post_score_#{post.post_id}").on "click", @submitPostVote # Submit vote
 						elem.find(".like").attr("id", "post_like_#{post.post_id}").on "click", @submitPostVote
-					if i < res.length-3
+					if i > 3
 						delay = 800
 					else
 						delay = 0
@@ -265,6 +280,8 @@ class ZeroBlog extends ZeroFrame
 		$("body").addClass("loaded") # Back/forward button keep position support
 		$('pre code').each (i, block) -> # Higlight code blocks
 			hljs.highlightBlock(block)
+		@addLazyVideos()
+		@checkLazyVideos()
 		@event_page_load.resolve()
 		@cmd "innerLoaded", true
 
@@ -307,16 +324,16 @@ class ZeroBlog extends ZeroFrame
 	applyPostdata: (elem, post, full=false, delay=0) ->
 		title_hash = post.title.replace(/[#?& ]/g, "+").replace(/[+]+/g, "+")
 		elem.data("object", "Post:"+post.post_id)
-		$(".title .editable", elem).html(post.title).attr("href", "?Post:#{post.post_id}:#{title_hash}").data("content", post.title)
+		$(".title .editable", elem).html(post.title).attr("href", "?#{@section}&Post:#{post.post_id}:#{title_hash}").data("content", post.title)
 		date_published = Time.since(post.date_published)
 		# Published date
 		if post.body.match /^---/m # Has more over fold
 			date_published += " &middot; #{Time.readtime(post.body)}" # If has break add readtime
-			$(".more", elem).css("display", "inline-block").attr("href", "?Post:#{post.post_id}:#{title_hash}")
+			$(".more", elem).css("display", "inline-block").attr("href", "?#{@section}&Post:#{post.post_id}:#{title_hash}")
 		$(".details .published", elem).html(date_published).data("content", post.date_published)
 		# Comments num
 		if post.comments > 0
-			$(".details .comments-num", elem).css("display", "inline").attr("href", "?Post:#{post.post_id}:#{title_hash}")
+			$(".details .comments-num", elem).css("display", "inline").attr("href", "?#{@section}&Post:#{post.post_id}:#{title_hash}")
 			$(".details .comments-num .num", elem).text("#{post.comments} comments")
 		else
 			$(".details .comments-num", elem).css("display", "none")

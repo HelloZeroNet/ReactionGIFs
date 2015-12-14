@@ -73,18 +73,42 @@ a:hover { color: #FFF }
 .icon-help.active { background-color: #EEE }
 
 /* -- Head -- */
-.head { font-size: 30px; display: inline-block; left: 0%; position: absolute; }
+
+.sections { position: absolute; top: 0px; display: block; padding: 9px 0px; font-size: 13px; background-color: #171719; width: 100%; left: 0px; padding-left: 15px; box-sizing: border-box; }
+.sections a { margin-left: 0px; margin-left: 20px; margin-right: 15px;  border: 0px; border-bottom: 2px solid #FFDB00; opacity: 0.8; transition: opacity 0.6s }
+.sections a:hover { opacity: 1; transition: 0s }
+.sections a:before { content: "\2022"; color: #FFDB00; display: inline-block; position: absolute; margin-left: -13px; font-size: 22px; line-height: 24px; }
+.sections a.section-RedditGifs { border-bottom-color: #86E7F5; }
+.sections a.section-RedditGifs:before { color: #86E7F5; }
+.sections a.section-RedditNsfwGifs { border-bottom-color: #FB754D; }
+.sections a.section-RedditNsfwGifs:before { color: #FB754D; }
+
+.head { font-size: 30px; left: 0%; position: absolute; top: 60px; display: none }
 .head a { font-family: Monospace; font-weight: normal; border: 0px; color: black; transition: 1s; background-color: #FFDB00; padding: 5px 20px; display: block; float: left }
 .head a:hover, .head-link.active { background-color: #FFFA22; color: black; transition: 0s }
 .head .head-link {
 	box-shadow: inset 15px 0px 55px -40px black; font-size: 14px; font-family: Roboto; text-decoration: underline;
 	line-height: 36px; font-weight: bold; text-transform: uppercase; color: rgba(0, 0, 0, 0.83);
 }
+.page-DevopsReactions .head-DevopsReactions { display: inline-block; }
+.page-DevopsReactions .section-DevopsReactions { opacity: 1 }
+
+.page-RedditGifs .head-RedditGifs { display: inline-block; }
+.page-RedditGifs .head-RedditGifs a { background-color: #86E7F5 }
+.page-RedditGifs .head-RedditGifs a:hover { background-color: #4DDBFF }
+.page-RedditGifs .post .title a { color: #86E7F5 }
+.page-RedditGifs .section-RedditGifs { opacity: 1 }
+
+.page-RedditNsfwGifs .head-RedditNsfwGifs { display: inline-block; }
+.page-RedditNsfwGifs .head-RedditNsfwGifs a { background-color: #FB754D }
+.page-RedditNsfwGifs .head-RedditNsfwGifs a:hover { background-color: #FC9D4F }
+.page-RedditNsfwGifs .post .title a { color: #FB754D }
+.page-RedditNsfwGifs .section-RedditNsfwGifs { opacity: 1 }
 
 /* -- Left -- */
 
 .left { float: left; position: absolute; width: 220px; padding-left: 20px; padding-right: 20px; margin-top: 60px; text-align: right; display: none }
-.right { float: left; padding-left: 30px; margin-left: 0px; max-width: 1000px; padding-right: 60px; padding-top: 100px }
+.right { float: left; padding-left: 30px; margin-left: 0px; max-width: 1000px; padding-right: 60px; padding-top: 160px }
 
 .left .avatar {
 	background-color: #F0F0F0; width: 60px; height: 60px; border-radius: 100%; margin-bottom: 10px;
@@ -117,7 +141,6 @@ a:hover { color: #FFF }
 
 .post { margin-bottom: 50px; padding-bottom: 50px; border-bottom: 0px solid #eee; min-width: 500px; width: 1100px }
 .post .title a { text-decoration: none; color: inherit; display: inline-block; border-bottom: none; font-weight: inherit; #fff400; clear: both; }
-.posts .title a:visited { color: #fff400 }
 .post h1 { width: 100% }
 .post .details { color: #BBB; margin-top: 5px; margin-bottom: 20px; margin-right: 20px; margin-left: -20px; width: 500px; float: left; font-size: 10px; text-align: right }
 .post .details .published { text-transform: uppercase; font-weight: bold; color: #5A5D62; }

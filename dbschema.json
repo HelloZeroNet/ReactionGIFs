@@ -45,11 +45,12 @@
 				["post_id", "INTEGER"],
 				["title", "TEXT"],
 				["body", "TEXT"],
+				["source", "TEXT"],
 				["date_published", "INTEGER"],
 				["json_id", "INTEGER REFERENCES json (json_id)"]
 			],
-			"indexes": ["CREATE UNIQUE INDEX post_uri ON post(json_id, post_id)", "CREATE INDEX post_id ON post(post_id)"],
-			"schema_changed": 1426195823
+			"indexes": ["CREATE UNIQUE INDEX post_uri ON post(json_id, post_id)", "CREATE INDEX post_id ON post(post_id)", "CREATE INDEX post_source ON post(source)"],
+			"schema_changed": 1426195824
 		},
 		"post_vote": {
 			"cols": [
