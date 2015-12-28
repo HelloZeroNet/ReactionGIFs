@@ -183,7 +183,6 @@
 }).call(this);
 
 
-
 /* ---- data/1Gif7PqWTzVWDQ42Mo7np3zXmGAo3DXc7h/js/lib/jquery.csslater.coffee ---- */
 
 
@@ -311,7 +310,6 @@
   };
 
 }).call(this);
-
 
 
 /* ---- data/1Gif7PqWTzVWDQ42Mo7np3zXmGAo3DXc7h/js/lib/marked.min.js ---- */
@@ -595,7 +593,6 @@
 }).call(this);
 
 
-
 /* ---- data/1Gif7PqWTzVWDQ42Mo7np3zXmGAo3DXc7h/js/utils/InlineEditor.coffee ---- */
 
 
@@ -793,7 +790,6 @@
 }).call(this);
 
 
-
 /* ---- data/1Gif7PqWTzVWDQ42Mo7np3zXmGAo3DXc7h/js/utils/RateLimit.coffee ---- */
 
 
@@ -821,7 +817,6 @@
   };
 
 }).call(this);
-
 
 
 /* ---- data/1Gif7PqWTzVWDQ42Mo7np3zXmGAo3DXc7h/js/utils/Text.coffee ---- */
@@ -919,7 +914,6 @@
 }).call(this);
 
 
-
 /* ---- data/1Gif7PqWTzVWDQ42Mo7np3zXmGAo3DXc7h/js/utils/Time.coffee ---- */
 
 
@@ -990,7 +984,6 @@
   window.Time = new Time;
 
 }).call(this);
-
 
 
 /* ---- data/1Gif7PqWTzVWDQ42Mo7np3zXmGAo3DXc7h/js/utils/ZeroFrame.coffee ---- */
@@ -1102,7 +1095,6 @@
   window.ZeroFrame = ZeroFrame;
 
 }).call(this);
-
 
 
 /* ---- data/1Gif7PqWTzVWDQ42Mo7np3zXmGAo3DXc7h/js/Comments.coffee ---- */
@@ -1356,7 +1348,6 @@
 }).call(this);
 
 
-
 /* ---- data/1Gif7PqWTzVWDQ42Mo7np3zXmGAo3DXc7h/js/Gifs.coffee ---- */
 
 
@@ -1477,8 +1468,12 @@
           video[0].play();
           _results.push(video.addClass("playing"));
         } else {
-          video[0].pause();
-          _results.push(video.removeClass("playing"));
+          if (!video[0].paused) {
+            video[0].pause();
+            _results.push(video.removeClass("playing"));
+          } else {
+            _results.push(void 0);
+          }
         }
       }
       return _results;

@@ -72,7 +72,7 @@ class RedditNsfwGifs(Updater):
             if not row: continue
             if "reddit.com/" in row["data"]["url"]: continue
 
-            if row["data"]["score"] > 100:
+            if row["data"]["score"] > 200:
                 video = {"title": row["data"]["title"], "source": "RedditNsfwGifs"}
                 url = row["data"]["url"]
                 if url.endswith(".mp4"):
@@ -92,7 +92,7 @@ def download(gif_url, gif_path):
     req.add_header("Referer", gif_url)
     data = urllib2.urlopen(req).read()
     if "<html" in data:
-        new_url = re.search("http[s]{0,1}://[^\"\']*?mp4", data).group(0)
+        new_url = re.search("(http[s]{0,1}://[^\"\']*?mp4)[\"']", data).group(1)
         print "- Html source, redirecting to %s" % new_url
         req = urllib2.Request(new_url)
         req.add_header("Referer", new_url)
@@ -114,7 +114,7 @@ def convertToMp4(gif_path, mp4_path):
         "-movflags", "faststart",
         "-force_key_frames", "00:00:00.100",
         "-filter:v scale=trunc(iw/2)*2:trunc(ih/2)*2",
-        "-vf", "scale=iw*min(1\,if(gt(iw\,ih)\,600/iw\,(600*sar)/ih)):(floor((ow/dar)/2))*2",
+        "-vf", "scale=floor(iw*min(1\,if(gt(iw\,ih)\,600/iw\,(500*sar)/ih))/2)*2:(floor((ow/dar)/2))*2",
         mp4_path
     ]
     process = subprocess.Popen(" ".join(cmd), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -145,7 +145,6 @@ def updateSites():
         if video["title"] in titles:
             print "* Already exist, skipping: %s / %s" % (video["source"], video["title"])
             continue
-
         if video.get("mp4_url"):
             raise "Unsupported"
             """print "- Downloading MP4 %s..." % video["mp4_url"]
@@ -154,13 +153,22 @@ def updateSites():
             video_size = getMp4Dimensions(mp4_path)"""
         else:
             print "- Downloading GIF %s..." % video["gif_url"]
-            gif_path = download(video["gif_url"], "temp/last.gif")
-            mp4_path = "../data/mp4-%s/%s.mp4" % (video["source"], data["next_post_id"])
+            try:
+                gif_path = download(video["gif_url"], "temp/last.gif")
+            except Exception, err:
+                print "Error downloading video: %s, skipping" % err
+                continue
+            mp4_path = "../data/mp4-%s/%s.mp4" % (video["source"].lower(), data["next_post_id"])
             print "- Converting %s to %s..." % (gif_path, mp4_path)
             video_size = convertToMp4(gif_path, mp4_path)
 
-        if os.path.getsize(mp4_path) > 1024*1024:
-            print "! Too large, skipping: %s" % os.path.getsize(mp4_path)
+        if not os.path.isfile(mp4_path):
+            print "! Converting failed, skipping"
+            continue
+
+        if os.path.getsize(mp4_path) > 1024*1024 or os.path.getsize(mp4_path) < 30:
+            print "! Too large or too small, skipping: %s" % os.path.getsize(mp4_path)
+            os.unlink(mp4_path)
             continue
 
         if video_size:
@@ -180,7 +188,7 @@ def updateSites():
                 "source": video["source"],
                 "body":
                     '<video src="data/mp4-%s/%s.mp4" width=%.0f height=%.0f loop muted preload="auto"></video>' %
-                    (video["source"], data["next_post_id"], width_resized, height_resized)
+                    (video["source"].lower(), data["next_post_id"], width_resized, height_resized)
             }
             data["post"].insert(0, post)
             data["next_post_id"] += 1
@@ -196,5 +204,7 @@ if __name__ == "__main__":
     added = updateSites()
     if added:
         os.chdir("../../../")
-        os.system("python zeronet.py siteSign 1Gif7PqWTzVWDQ42Mo7np3zXmGAo3DXc7h")
+        os.system("python zeronet.py siteSign 1Gif7PqWTzVWDQ42Mo7np3zXmGAo3DXc7h --publish")
     print "Done, added: %s" % added
+    #download("http://imgur.com/CDWxtM7", "temp/last.gif")
+    #print convertToMp4("temp/last.gif", "temp/last.mp4")
