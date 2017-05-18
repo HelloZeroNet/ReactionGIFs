@@ -551,7 +551,7 @@ class ZeroBlog extends ZeroFrame
 
 	submitPostVote: (e) =>
 		if not Page.site_info.cert_user_id # No selected cert
-			Page.cmd "certSelect", [["zeroid.bit"]]
+			Page.cmd "certSelect", [["zeroid.bit", "zeroverse.bit"]]
 			return false
 
 		elem = $(e.currentTarget)
