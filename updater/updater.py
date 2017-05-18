@@ -4,6 +4,7 @@ import os
 import json
 import time
 import subprocess
+import sys
 
 opener = urllib2.build_opener()
 opener.addheaders = [('User-agent', 'Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/48.0.2564.41 Safari/537.36')]
@@ -113,11 +114,11 @@ def convertToMp4(gif_path, mp4_path):
         "-pix_fmt", "yuv420p",
         "-movflags", "faststart",
         "-force_key_frames", "00:00:00.100",
-        "-filter:v scale=trunc(iw/2)*2:trunc(ih/2)*2",
+        "-filter:v", "scale=trunc(iw/2)*2:trunc(ih/2)*2",
         "-vf", "scale=floor(iw*min(1\,if(gt(iw\,ih)\,600/iw\,(500*sar)/ih))/2)*2:(floor((ow/dar)/2))*2",
         mp4_path
     ]
-    process = subprocess.Popen(" ".join(cmd), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     output = process.stderr.read()
     size_match = re.search("Video: h264.*, ([0-9]+)x([0-9]+)", output)
     if size_match:
@@ -141,7 +142,13 @@ def updateSites():
     for site in sites:
         videos += site.getVideos(pages=3)
 
+    source_added = {}
+
     for video in reversed(videos):
+        if video["source"] in source_added:
+            print "! Only one video per section per update"
+            continue
+
         if video["title"] in titles:
             print "* Already exist, skipping: %s / %s" % (video["source"], video["title"])
             continue
@@ -194,6 +201,8 @@ def updateSites():
             data["next_post_id"] += 1
             json.dump(data, open("../data/data.json", "w"), indent=1)
             titles.append(video["title"])
+
+            source_added[video["source"]] = True
             added += 1
         else:
             print "! Error converting gif to mp4"
@@ -203,7 +212,7 @@ def updateSites():
 if __name__ == "__main__":
     added = updateSites()
     if added:
-        os.chdir("../../../")
+        os.chdir(sys.argv[1])
         os.system("python zeronet.py siteSign 1Gif7PqWTzVWDQ42Mo7np3zXmGAo3DXc7h --publish")
     print "Done, added: %s" % added
     #download("http://imgur.com/CDWxtM7", "temp/last.gif")
